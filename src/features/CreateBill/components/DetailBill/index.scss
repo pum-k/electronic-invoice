@@ -1,0 +1,55 @@
+.detail-invoice-table input {
+  border: none;
+  width: 100%;
+  background: none;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[type="number"]::-webkit-inner-spin-button,
+  &[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+}
+
+.table th {
+  text-align: center;
+}
+
+.table thead {
+    background-color: #0275d8;
+    color: white !important;
+}
+
+.result {
+    margin-top: 20px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 55px;
+}
+
+.content-bottom__result {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.total-bill {
+  border: none !important;
+  border-bottom: 1px solid #000 !important;
+  &[type="number"]::-webkit-inner-spin-button,
+  &[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:focus {
+    outline: none !important;
+    
+  }
+}
+
+

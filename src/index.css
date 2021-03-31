@@ -1,10 +1,18 @@
 body {
   margin: 0;
+  position: relative; /* usually the parent, in this case the body element, has position relative so that the absolute positioned child is positioned relative to it */
+  height: 100vh; /* 100% of the viewport height */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #EEF2F7 !important;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
 }
 
 code {

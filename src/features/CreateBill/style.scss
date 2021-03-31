@@ -1,0 +1,31 @@
+.content {
+  padding: 1em;
+  min-height: 560px;
+  background: white;
+  position: relative;
+
+
+  &-mid Input {
+    color: #FF6B35;
+    border: none;
+    border-bottom: 1px dashed #ccc;
+  }
+
+  &__title {
+    margin-bottom: 30px;
+    text-align: center;
+    color: #FF6B35;
+  }
+}
+
+.container-fluid {
+  margin-top: 20px;
+}
+
+.alert {
+  // position: absolute;
+}
+
+.modal-print-invoice {
+  max-width: 1600px; 
+}

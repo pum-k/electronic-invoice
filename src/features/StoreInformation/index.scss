@@ -1,0 +1,23 @@
+.ctn-store {
+    height: 100vh !important;
+    margin-top: 0 !important;
+    background-color: white;
+    padding-top: 50px !important;
+
+    & > h1 {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    & .input-group {
+        margin-bottom: 25px;
+    }
+
+    &__action{
+        text-align: right;
+
+        & > button {
+            min-width: 100px;
+            margin-left: 15px;
+        }
+    }
+}

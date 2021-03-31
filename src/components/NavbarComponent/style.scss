@@ -1,0 +1,34 @@
+.navbar {
+  background-color: #FF6B35;
+
+  &-brand {
+    color: white;
+    font-size: 36px !important;
+    &:hover {
+      color: white;
+    }
+  }
+
+  &-btn-menu:hover {
+    border: 1px solid black !important;
+    background-color: #FFfffb !important;
+
+    &:visited {
+      background-color: #FFfffb !important;
+    }
+  }
+}
+
+.nav-item {
+  text-align: center;
+  &:hover {
+    background-color: #b33001 !important;
+    transition: 0.4s;
+  }
+  
+  & a {
+    color: white !important;
+    text-decoration: none !important;
+  }
+
+}

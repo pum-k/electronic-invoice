@@ -1,0 +1,60 @@
+.print-invoice {
+  min-width: 21cm;
+  min-height: 29.7cm;
+  margin: 27mm 16mm 27mm 16mm;
+  border: 1px solid gray;
+  padding: 50px;
+  background-color: white;
+  position: relative;
+  margin: 0 auto;
+}
+.right {
+    text-align: right;
+}
+.title {
+    margin-bottom: 15px;
+}
+
+.store {
+  display: flex;
+
+  &__logo {
+    margin-right: 15px;
+    background-color: yellow;
+    width: 64px;
+    height: 64px;
+  }
+}
+
+
+.table-body {
+    text-align: center;
+}
+
+.print-invoice-table > tfoot{
+    background-color: #FF6B35;
+}
+
+.info-customer{
+    margin: 50px 0;
+
+    & h2 {
+      background-color: #FF6B35;
+    }
+}
+
+.info-invoice {
+
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.invoice-footer {
+  width: 90%;
+  position: absolute;
+  text-align: center;
+  bottom: 30px;
+}

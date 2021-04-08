@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -15,24 +15,78 @@ import {
 } from "reactstrap";
 import "./index.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
-const ProductManagement = () => {
-  const [products, setProducts] = useState([
-    {
-        productID: 'mi_hao_hao',
-        productName: 'Mì hảo hảo',
-        unit: 'Gói',
-        unitPrice: '3700',
-    }
-  ]);
+import Axios from "axios";
 
+const ProductManagement = () => {
+  const [products, setProducts] = useState([]);
+  const [productToAdd, setproductToAdd] = useState({
+    idProduct: "",
+    Name: "ez",
+    Unit: "",
+    UnitPrice: "",
+  });
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
+
+  useEffect(() => {
+    async function getProducts() {
+      try {
+        const axiosData = await Axios.get("http://localhost:3001/products");
+        const { data } = axiosData;
+        setProducts(data);
+      } catch (error) {
+        console.log("Error fetching: " + error.message);
+      }
+    }
+    getProducts();
+  }, []);
+
+  // Add product
+  const handleOnChangeAddProduct = (e) => {
+    const getInputFieldValue = e.value;
+    const getInputFieldId = e.id;
+    const productNeedAdd = { ...productToAdd };
+    productNeedAdd[getInputFieldId] = getInputFieldValue;
+    setproductToAdd(productNeedAdd);
+  };
+
+  const automaticIdProduct = () => {
+    let { Name } = productToAdd;
+    let newIdProduct = Name.normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .replace(/ /g, "_");
+    return newIdProduct;
+  };
+
+  const checkIsInvalidProductToAdd = () => {
+    for (let key in productToAdd) {
+      if (
+        productToAdd[key] !== null &&
+        productToAdd[key] != "" &&
+        Object.keys(productToAdd).length === 4
+      )
+        return true;
+    }
+    return false;
+  };
+
+  const handleOnClickAddProduct = () => {
+    const productNeedAddFinish = { ...productToAdd };
+    productNeedAddFinish["idProduct"] = automaticIdProduct().toLowerCase();
+    setproductToAdd(productNeedAddFinish);
+    checkIsInvalidProductToAdd ? console.log(productToAdd) : alert('FAILED');
+    setproductToAdd([]);
+  };
 
   return (
     <Container className="ctn-customer-management" fluid={true}>
       <Row>
         <Col>
-          <h1 style={{textAlign: 'center', marginBottom: 50}}>Quản lý sản phẩm</h1>
+          <h1 style={{ textAlign: "center", marginBottom: 50 }}>
+            Quản lý sản phẩm
+          </h1>
         </Col>
       </Row>
       <Row>
@@ -65,10 +119,10 @@ const ProductManagement = () => {
                 return (
                   <tr>
                     <td>{index + 1}</td>
-                    <td>{product.productID}</td>
-                    <td>{product.productName}</td>
-                    <td>{product.unit}</td>
-                    <td>{product.unitPrice}</td>
+                    <td>{product.idProduct}</td>
+                    <td>{product.Name}</td>
+                    <td>{product.Unit}</td>
+                    <td>{product.UnitPrice}</td>
                   </tr>
                 );
               })}
@@ -77,36 +131,60 @@ const ProductManagement = () => {
         </Col>
       </Row>
       <Row>
-          <Col>
-              <Button color="primary" block onClick={toggle}>Thêm sản phẩm</Button>
-          </Col>
+        <Col>
+          <Button color="primary" block onClick={toggle}>
+            Thêm sản phẩm
+          </Button>
+        </Col>
       </Row>
 
       <Modal isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>Thêm sản phẩm</ModalHeader>
         <ModalBody>
           <InputGroup row className="margin-bottom-15">
-              <Label sm={4}>Tên sản phẩm: </Label>
-              <Col sm={8}>
-              <Input type="text"/>
-              </Col>
+            <Label sm={4}>Tên sản phẩm: </Label>
+            <Col sm={8}>
+              <Input
+                type="text"
+                id="Name"
+                onChange={(e) => handleOnChangeAddProduct(e.target)}
+              />
+            </Col>
           </InputGroup>
           <InputGroup row className="margin-bottom-15">
-              <Label sm={4}>Đơn vị tính: </Label>
-              <Col sm={8}>
-              <Input type="text"/>
-              </Col>
+            <Label sm={4}>Đơn vị tính: </Label>
+            <Col sm={8}>
+              <Input
+                type="text"
+                id="Unit"
+                onChange={(e) => handleOnChangeAddProduct(e.target)}
+              />
+            </Col>
           </InputGroup>
           <InputGroup row>
-              <Label sm={4}>Đơn giá: </Label>
-              <Col sm={8}>
-              <Input type="number"/>
-              </Col>
+            <Label sm={4}>Đơn giá: </Label>
+            <Col sm={8}>
+              <Input
+                type="number"
+                id="UnitPrice"
+                onChange={(e) => handleOnChangeAddProduct(e.target)}
+              />
+            </Col>
           </InputGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={toggle}>Xác nhận</Button>{' '}
-          <Button color="danger" onClick={toggle}>Hủy bỏ</Button>
+          <Button
+            color="primary"
+            onClick={() => {
+              toggle();
+              handleOnClickAddProduct();
+            }}
+          >
+            Xác nhận
+          </Button>
+          <Button color="danger" onClick={toggle}>
+            Hủy bỏ
+          </Button>
         </ModalFooter>
       </Modal>
     </Container>

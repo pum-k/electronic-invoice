@@ -1,28 +1,35 @@
-import express from 'express';
-import Tedious from 'tedious';
-
-const Connection = Tedious.Connection;
+import mysql from "mysql";
+import express from "express";
+import cors from "cors";
 const app = express();
 
-var config = {  
-    server: 'DESKTOP-TTB46DU',  //update me
-    authentication: {
-        type: 'default',
-        options: {
-            userName: 'khoaf', //update me
-            password: 'khoaf'  //update me
-        }
-    },
-};  
-var connection = new Connection(config);  
-    connection.on('connect', function(err) {  
-        // If no error, then good to proceed.
-        console.log("Connected");  
-    });
-    
-    connection.connect();
+// listener
+app.listen(3001, function () {
+  console.log("Node server running @ http://localhost:3001");
+});
 
+app.use(cors());
 
-//listner
-const PORT = 3000;
-app.listen(PORT);
+// connect mysql
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "einvoicedb",
+});
+
+connection.connect((error) => {
+  if (error) console.log(error);
+  else console.log("Connected!");
+});
+
+// mysql query
+const getProducts = "select * from products";
+
+// app get
+app.get("/products", (req, res) => {
+  connection.query(getProducts, (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});

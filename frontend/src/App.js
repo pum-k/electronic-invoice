@@ -1,14 +1,12 @@
 import React from "react";
-import Footer from "./components/Footer";
 import NavbarComponent from "./components/NavbarComponent";
-import PrintInvoice from "./features/PrintInvoice";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-    <div className="App">
+    <div style={{position: 'relative'}}>
       <NavbarComponent />
-      <Footer />
-      {/* <PrintInvoice /> */}
+      <div style={{color: 'red', position: 'absolute',bottom: '0',height: '50px', width: '100%'}}> cc3dawd</div>
     </div>
   );
 }

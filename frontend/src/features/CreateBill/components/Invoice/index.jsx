@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, FormGroup, Input, Label } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -41,7 +41,6 @@ const Invoice = (params) => {
     }
   };
   params.setInvoice(invoice);
-
   return (
     <div className="content shadow-lg p-3 mb-5 bg-white rounded">
       <h4 className="content__title">Thông tin hóa đơn</h4>
@@ -87,9 +86,8 @@ const Invoice = (params) => {
             onChange={(e) => handleOnChange(e.target)}
           >
             <option value="">--Chọn--</option>
-            <option value="tienmat">Tiền mặt</option>
-            <option value="chuyenkhoan">Chuyển khoản</option>
-            <option value="vidientu">Ví điện tử</option>
+            <option value="Tiền mặt">Tiền mặt</option>
+            <option value="Chuyển Khoản">Chuyển khoản</option>
           </Input>
         </Col>
       </FormGroup>

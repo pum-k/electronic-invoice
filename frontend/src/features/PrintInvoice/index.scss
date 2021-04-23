@@ -1,60 +1,77 @@
-.print-invoice {
-  min-width: 21cm;
-  min-height: 29.7cm;
-  margin: 27mm 16mm 27mm 16mm;
-  border: 1px solid gray;
-  padding: 50px;
-  background-color: white;
-  position: relative;
-  margin: 0 auto;
+*,
+p {
+  margin: 0;
+  padding: 0;
 }
+
+.left {
+  text-align: left;
+}
+
 .right {
-    text-align: right;
-}
-.title {
-    margin-bottom: 15px;
+  text-align: right;
 }
 
-.store {
-  display: flex;
+.a4 {
+  // display: flex;
+  width: 21cm;
+  min-height: 29.7cm;
+  padding: 2cm;
+  margin: 1cm auto;
+  border: 1px #d3d3d3 solid;
+  border-radius: 5px;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  &__title {
+    background-color: #0275d8;
+    color: #fff;
+    align-items: center;
+    height: 100px;
+    margin-bottom: 50px;
+  }
+  &__store {
+    &__title {
+      border: none;
+      border-bottom: 2px solid #0275d8;
+      height: 40px;
+      width: 60%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  }
+  &__customer {
+    position: relative;
+    &__title {
+      border: none;
+      border-bottom: 2px solid #0275d8;
+      height: 40px;
+      width: 60%;
+      text-align: right;
+      position: absolute;
+      right: 15px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  }
+  &__infor {
+    margin-bottom: 20px;
 
-  &__logo {
-    margin-right: 15px;
-    background-color: yellow;
-    width: 64px;
-    height: 64px;
+    & p {
+      margin: 15px 0;
+    }
+  }
+
+  &__tb__footer {
+    color: #0275d8;
+    border: none;
+  }
+
+  &__footer {
+    margin-top: 30px;
   }
 }
 
 
-.table-body {
-    text-align: center;
-}
-
-.print-invoice-table > tfoot{
-    background-color: #FF6B35;
-}
-
-.info-customer{
-    margin: 50px 0;
-
-    & h2 {
-      background-color: #FF6B35;
-    }
-}
-
-.info-invoice {
-
-}
-
-p {
-    margin: 0;
-    padding: 0;
-}
-
-.invoice-footer {
-  width: 90%;
-  position: absolute;
-  text-align: center;
-  bottom: 30px;
-}

@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Table, Button, FormGroup, Label, Col } from "reactstrap";
 import "./index.scss";
 import { IoMdRemoveCircleOutline } from "react-icons/io";
+import axios from "axios";
 const DetailBill = (params) => {
+  const [valueSearched, setValueSearched] = useState([
+    { idProduct: "", Name: "", Unit: "", UnitPrice: "" },
+  ]);
   const [inputFields, setInputFields] = useState([
     {
-      productId: "",
-      productName: "",
-      unit: "",
-      quanlity: "",
-      unitPrice: "",
-      totalPayment: "",
+      idProduct: "",
+      Name: "",
+      Unit: "",
+      Quanlity: "",
+      UnitPrice: "",
+      TotalPayment: "",
     },
   ]);
 
@@ -18,13 +22,17 @@ const DetailBill = (params) => {
     setInputFields([
       ...inputFields,
       {
-        productId: "",
-        productName: "",
-        unit: "",
-        quanlity: "",
-        unitPrice: "",
-        totalPayment: "",
+        idProduct: "",
+        Name: "",
+        Unit: "",
+        Quanlity: "",
+        UnitPrice: "",
+        TotalPayment: "",
       },
+    ]);
+    setValueSearched([
+      ...valueSearched,
+      { idProduct: "", Name: "", Unit: "", UnitPrice: "" },
     ]);
   };
 
@@ -37,9 +45,75 @@ const DetailBill = (params) => {
   const handleOnChange = (event, index) => {
     const values = [...inputFields];
     values[index][event.target.id] = event.target.value;
+    if (event.target.id === "idProduct" && event.target.value === "") {
+      setRemovePromt(false);
+      for (let item in valueSearched[index]) {
+        valueSearched[index][item] = "";
+      }
+      for (let item in inputFields[index]) {
+        inputFields[index][item] = "";
+      }
+
+      // setInputFields(getValue2);
+    }
+    setRemovePromt(false);
+    if (event.target.id === "Quanlity") {
+      if (values[index]["UnitPrice"]) {
+        values[index]["TotalPayment"] =
+          values[index][event.target.id] * values[index]["UnitPrice"];
+      }
+    }
+    if (event.target.id === "UnitPrice") {
+      if (values[index]["Quanlity"]) {
+        values[index]["TotalPayment"] =
+          values[index][event.target.id] * values[index]["Quanlity"];
+      }
+    }
     setInputFields(values);
+    // console.log(inputFields);
     params.setDetailBill(inputFields);
-  }
+  };
+  const [removePromt, setRemovePromt] = useState(false);
+  const timeOutSearch = useRef(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const handleSearchByIdProduct = (e, index) => {
+    setIsDisabled(false);
+    let idProduct = e.value;
+    if (timeOutSearch.current) {
+      clearTimeout(timeOutSearch.current);
+    }
+    timeOutSearch.current = setTimeout(async () => {
+      await axios
+        .post("http://localhost:3001/search-product-exactly", {
+          keySearch: idProduct,
+        })
+        .then((response) => {
+          let { data } = response;
+          if (data[0].length > 0) {
+            setIsDisabled(true);
+            let getValue = [...valueSearched];
+            getValue[index].Unit = data[0][0].Unit;
+            getValue[index].UnitPrice = data[0][0].UnitPrice;
+            getValue[index].idProduct = data[0][0].idProduct;
+            getValue[index].Name = data[0][0].Name;
+
+            let getValue2 = [...inputFields];
+            getValue2[index].Unit = data[0][0].Unit;
+            getValue2[index].UnitPrice = data[0][0].UnitPrice;
+            getValue2[index].idProduct = data[0][0].idProduct;
+            getValue2[index].Name = data[0][0].Name;
+            getValue2[index].Quanlity = "";
+            getValue2[index].TotalPayment = "";
+
+            setInputFields(getValue2);
+            setValueSearched([
+              ...getValue,
+              { idProduct: "", Name: "", Unit: "", UnitPrice: "" },
+            ]);
+          }
+        });
+    }, 300);
+  };
 
   return (
     <>
@@ -49,12 +123,12 @@ const DetailBill = (params) => {
           <thead>
             <tr>
               <th>Stt</th>
-              <th class="col-md-2">Mã sản phẩm</th>
-              <th class="col-md-3">Tên sản phẩm</th>
-              <th class="col-md-1">Đơn vị tính</th>
-              <th class="col-md-1">Số lượng</th>
-              <th class="col-md-2">Đơn giá</th>
-              <th class="col-md-2">Thành tiền</th>
+              <th>Mã sản phẩm</th>
+              <th>Tên sản phẩm</th>
+              <th>Đơn vị tính</th>
+              <th>Số lượng</th>
+              <th>Đơn giá</th>
+              <th>Thành tiền</th>
               <th>Xóa</th>
             </tr>
           </thead>
@@ -71,39 +145,86 @@ const DetailBill = (params) => {
                     />
                   </td>
                   <td>
-                    <input type="text" id="productId" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      autocomplete="off"
+                      type="text"
+                      id="idProduct"
+                      onChange={(event) => {
+                        handleOnChange(event, index);
+                        handleSearchByIdProduct(event.target, index);
+                      }}
+                      defaultValue={valueSearched[index].idProduct}
+                      onBlur={(e) => {
+                        if (e.target.value) {
+                          handleAddProduct();
+                        }
+                      }}
+                    />
                   </td>
                   <td>
-                    <input type="text" id="productName" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      disabled={isDisabled}
+                      type="text"
+                      id="Name"
+                      onChange={(event) => handleOnChange(event, index)}
+                      defaultValue={valueSearched[index].Name}
+                    />
                   </td>
                   <td>
-                    <input type="text" id="unit" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      disabled={isDisabled}
+                      type="text"
+                      id="Unit"
+                      onChange={(event) => handleOnChange(event, index)}
+                      defaultValue={valueSearched[index].Unit}
+                    />
                   </td>
                   <td>
-                    <input type="text" id="quanlity" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      type="text"
+                      id="Quanlity"
+                      onChange={(event) => handleOnChange(event, index)}
+                      defaultValue={inputFields[index].Quanlity}
+                    />
                   </td>
                   <td>
-                    <input type="number" id="unitPrice" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      disabled={isDisabled}
+                      type="number"
+                      id="UnitPrice"
+                      onChange={(event) => handleOnChange(event, index)}
+                      defaultValue={valueSearched[index].UnitPrice}
+                    />
                   </td>
                   <td>
-                    <input disabled type="number" id="totalPayment" onChange={(event) => handleOnChange(event, index)}/>
+                    <input
+                      disabled
+                      type="number"
+                      id="TotalPayment"
+                      onChange={(event) => handleOnChange(event, index)}
+                      defaultValue={inputFields[index].TotalPayment}
+                    />
                   </td>
                   <td>
-                    <Button
-                      color="danger"
-                      onClick={() => handleRemoveProduct(index)}
-                    >
-                      <IoMdRemoveCircleOutline />
-                    </Button>
+                    {index !== 0 ? (
+                      <Button
+                        color="danger"
+                        onClick={() => {
+                          handleRemoveProduct(index);
+                        }}
+                      >
+                        <IoMdRemoveCircleOutline />
+                      </Button>
+                    ) : null}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </Table>
-        <Button color="primary" size="sm" block onClick={handleAddProduct}>
+        {/* <Button color="primary" size="sm" block onClick={handleAddProduct}>
           Thêm sản phẩm
-        </Button>
+        </Button> */}
       </div>
     </>
   );

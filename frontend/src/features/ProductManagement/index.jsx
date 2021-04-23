@@ -23,6 +23,7 @@ import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { AiTwotoneEdit } from "react-icons/ai";
 
 const ProductManagement = () => {
+  const [render, setRender] = useState(true);
   const [products, setProducts] = useState([]);
   const [productToAdd, setproductToAdd] = useState({
     idProduct: "",
@@ -35,10 +36,9 @@ const ProductManagement = () => {
 
   const [modalDelete, setModalDelete] = useState(false);
   const toggleDelete = () => setModalDelete(!modalDelete);
-
   const [valueToDelete, setValueToDelete] = useState();
-  const [modalUpdate, setModalUpdate] = useState(false);
 
+  const [modalUpdate, setModalUpdate] = useState(false);
   const toggleUpdate = () => setModalUpdate(!modalUpdate);
   const [valueToUpdate, setValueToUpdate] = useState({
     idProduct: "",
@@ -60,7 +60,7 @@ const ProductManagement = () => {
       }
     }
     getProducts();
-  }, []);
+  }, [render]);
 
   // Add product
   const handleOnChangeAddProduct = (e) => {
@@ -108,7 +108,7 @@ const ProductManagement = () => {
               "Không thể thêm sản phẩm. Sản phẩm cần thêm đã tồn tại"
             );
           } else if (response.status) {
-            setProducts([...products, productNeedAddFinish]);
+            setRender(!render);
             Notification("success", "Bạn vừa thêm một sản phẩm mới thành công");
           } else
             Notification(
@@ -163,24 +163,15 @@ const ProductManagement = () => {
 
   const handleUpdate = async (isConfirm) => {
     if (isConfirm) {
-      let getProducts = [...products];
-      getProducts.forEach((item) => {
-        if (item.idProduct === valueToUpdate.idProduct) {
-          item.Unit = valueToUpdate.Unit;
-          item.UnitPrice = valueToUpdate.UnitPrice;
-        }
-      });
-      let newProductsAfterUpdate = getProducts.filter(
-        (product) => product.idProduct === valueToUpdate.idProduct
-      );
       await Axios.post("http://localhost:3001/update-product", {
-        idProduct: newProductsAfterUpdate[0].idProduct,
-        Unit: newProductsAfterUpdate[0].Unit,
-        UnitPrice: newProductsAfterUpdate[0].UnitPrice,
+        idProduct: valueToUpdate.idProduct,
+        Unit: valueToUpdate.Unit,
+        UnitPrice: valueToUpdate.UnitPrice,
       })
         .then((response) => {
           if (response.status) {
             Notification("success", "Sản phẩm đã được chỉnh sửa thành công");
+            setRender(!render);
           }
         })
         .catch((err) => {
@@ -195,20 +186,16 @@ const ProductManagement = () => {
   // Delete pro
   const handleDelete = async (isConfirm) => {
     if (isConfirm) {
-      const productToDelete = [...products];
       await Axios.post("http://localhost:3001/delete-product", {
         idProduct: valueToDelete.idProduct,
       })
         .then((response) => {
           if (response.status) {
             Notification("success", "Xóa sản phẩm thành công");
+            setRender(!render);
           }
         })
         .catch((err) => {});
-      var newProducts = productToDelete.filter((product) => {
-        return product.idProduct !== valueToDelete.idProduct;
-      });
-      setProducts(newProducts);
     }
   };
   return (
@@ -275,88 +262,6 @@ const ProductManagement = () => {
                         >
                           <IoMdRemoveCircleOutline />
                         </Button>
-                        <Modal isOpen={modalUpdate} toggle={toggleUpdate}>
-                          <ModalHeader toggle={toggleUpdate}>
-                            Chỉnh sửa sản phẩm
-                          </ModalHeader>
-                          <ModalBody>
-                            <InputGroup row className="margin-bottom-15">
-                              <Label sm={4}>Mã sản phẩm: </Label>
-                              <Col sm={8}>
-                                <Input
-                                  disabled
-                                  defaultValue={valueToUpdate.idProduct}
-                                />
-                              </Col>
-                            </InputGroup>
-                            <InputGroup row className="margin-bottom-15">
-                              <Label sm={4}>Tên sản phẩm: </Label>
-                              <Col sm={8}>
-                                <Input
-                                  disabled
-                                  defaultValue={valueToUpdate.Name}
-                                />
-                              </Col>
-                            </InputGroup>
-                            <InputGroup row className="margin-bottom-15">
-                              <Label sm={4}>Đơn vị tính: </Label>
-                              <Col sm={8}>
-                                <Input
-                                  defaultValue={valueToUpdate.Unit}
-                                  onChange={(e) => onChangeUpdate(e.target)}
-                                  id="Unit"
-                                />
-                              </Col>
-                            </InputGroup>
-                            <InputGroup row className="margin-bottom-15">
-                              <Label sm={4}>Đơn giá: </Label>
-                              <Col sm={8}>
-                                <Input
-                                  type="Number"
-                                  defaultValue={valueToUpdate.UnitPrice}
-                                  onChange={(e) => onChangeUpdate(e.target)}
-                                  id="UnitPrice"
-                                />
-                              </Col>
-                            </InputGroup>
-                          </ModalBody>
-                          <ModalFooter>
-                            <Button
-                              color="primary"
-                              onClick={() => {
-                                let isConfirm = true;
-                                handleUpdate(isConfirm);
-                                toggleUpdate();
-                              }}
-                            >
-                              Lưu lại
-                            </Button>{" "}
-                            <Button color="secondary" onClick={toggleUpdate}>
-                              Hủy bỏ
-                            </Button>
-                          </ModalFooter>
-                        </Modal>
-                        <Modal isOpen={modalDelete} toggle={toggleDelete}>
-                          <ModalHeader toggle={toggleDelete}>
-                            Xóa sản phẩm
-                          </ModalHeader>
-                          <ModalBody>Bạn có chắc muốn xóa sản phẩm</ModalBody>
-                          <ModalFooter>
-                            <Button
-                              color="primary"
-                              onClick={() => {
-                                let isConfirm = true;
-                                handleDelete(isConfirm);
-                                toggleDelete();
-                              }}
-                            >
-                              Xác nhận
-                            </Button>{" "}
-                            <Button color="secondary" onClick={toggleDelete}>
-                              Hủy bỏ
-                            </Button>
-                          </ModalFooter>
-                        </Modal>
                       </td>
                     </tr>
                   </>
@@ -373,6 +278,78 @@ const ProductManagement = () => {
           </Button>
         </Col>
       </Row>
+      <Modal isOpen={modalDelete} toggle={toggleDelete}>
+        <ModalHeader toggle={toggleDelete}>Xóa sản phẩm</ModalHeader>
+        <ModalBody>Bạn có chắc muốn xóa sản phẩm</ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => {
+              let isConfirm = true;
+              handleDelete(isConfirm);
+              toggleDelete();
+            }}
+          >
+            Xác nhận
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleDelete}>
+            Hủy bỏ
+          </Button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={modalUpdate} toggle={toggleUpdate}>
+        <ModalHeader toggle={toggleUpdate}>Chỉnh sửa sản phẩm</ModalHeader>
+        <ModalBody>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Mã sản phẩm: </Label>
+            <Col sm={8}>
+              <Input disabled defaultValue={valueToUpdate.idProduct} />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Tên sản phẩm: </Label>
+            <Col sm={8}>
+              <Input disabled defaultValue={valueToUpdate.Name} />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Đơn vị tính: </Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={valueToUpdate.Unit}
+                onChange={(e) => onChangeUpdate(e.target)}
+                id="Unit"
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Đơn giá: </Label>
+            <Col sm={8}>
+              <Input
+                type="Number"
+                defaultValue={valueToUpdate.UnitPrice}
+                onChange={(e) => onChangeUpdate(e.target)}
+                id="UnitPrice"
+              />
+            </Col>
+          </InputGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => {
+              let isConfirm = true;
+              handleUpdate(isConfirm);
+              toggleUpdate();
+            }}
+          >
+            Lưu lại
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleUpdate}>
+            Hủy bỏ
+          </Button>
+        </ModalFooter>
+      </Modal>
 
       <Modal isOpen={modalAdd} toggle={toggleAdd}>
         <ModalHeader toggle={toggleAdd}>Thêm sản phẩm</ModalHeader>

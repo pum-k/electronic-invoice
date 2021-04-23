@@ -24,6 +24,7 @@ import "react-notifications/lib/notifications.css";
 
 const CustomerManagement = () => {
   //DECLARE VARIABLE --------------------------------------------------------------------------------
+  const [render, setRender] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [inputSearch, setInputSearch] = useState();
   const timeOutSearch = useRef(null);
@@ -38,6 +39,21 @@ const CustomerManagement = () => {
     Address: "",
     CP: "",
   });
+  const [modalUpdate, setModalUpdate] = useState(false);
+  const toggleUpdate = () => setModalUpdate(!modalUpdate);
+  const [customerToUpdate, setCustomerToUpdate] = useState({
+    idCustomer: "",
+    FullName: "",
+    Phone: "",
+    Email: "",
+    DateOfBirth: "",
+    Address: "",
+    CP: "",
+  });
+  const [allowSaveUpdate, setAllowSaveUpdate] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
+  const toggleDelete = () => setModalDelete(!modalDelete);
+  const [customerToDelete, setCustomerToDelete] = useState();
   //GET DATA ----------------------------------------------------------------------------------------
   useEffect(() => {
     async function getCustomers() {
@@ -50,7 +66,7 @@ const CustomerManagement = () => {
       }
     }
     getCustomers();
-  }, []);
+  }, [render]);
 
   // SEARCH ------------------------------------------------------------------------------------------
   const controlInputSearch = (e) => {
@@ -113,10 +129,17 @@ const CustomerManagement = () => {
               "error",
               "Mã số khách hàng hoặc số điện thoại khách hàng đã tồn tại"
             );
-          } else if (response.status) {
+          } else if (
+            response.data["code"] === "ER_TRUNCATED_WRONG_VALUE_FOR_FIELD"
+          ) {
+            Notification(
+              "error",
+              "Không thể thêm khách hàng. Bạn đã nhập thiếu thông tin khách hàng"
+            );
+          } else {
             Notification("success", "Thêm khách hàng thành công");
             setCustomers([...customers, customerToAdd]);
-          } else Notification("error", "Có lỗi xảy ra, đề nghị thử lại");
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -138,6 +161,70 @@ const CustomerManagement = () => {
     });
   };
 
+  // UPDATE ----------------------------------------------------------------------------
+  const controlCustomerUpdate = (e) => {
+    setAllowSaveUpdate(true);
+    let getInputFieldValue = e.value;
+    let getInputFieldId = e.id;
+    const customerNeedUpdate = { ...customerToUpdate };
+    customerNeedUpdate[getInputFieldId] = getInputFieldValue;
+    setCustomerToUpdate(customerNeedUpdate);
+  };
+  const convertIsoDate = (isoDate) => {
+    let date = new Date(isoDate);
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let dt = date.getDate();
+
+    if (dt < 10) {
+      dt = "0" + dt;
+    }
+    if (month < 10) {
+      month = "0" + month;
+    }
+
+    return year + "-" + month + "-" + dt;
+  };
+  
+  const handleUpdate = async () => {
+    await axios
+      .post("http://localhost:3001/update-customer", {
+        idCustomer: customerToUpdate.idCustomer,
+        FullName: customerToUpdate.FullName,
+        Phone: customerToUpdate.Phone,
+        Email: customerToUpdate.Email,
+        DateOfBirth: convertIsoDate(customerToUpdate.DateOfBirth),
+        Address: customerToUpdate.Address,
+        CP: customerToUpdate.CP,
+      })
+      .then((response) => {
+        Notification("success", "Cập nhật thông tin khách hàng thành công");
+        setRender(!render);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // DELETE ------------------------------------------------------------
+  const handleDelete = async (isConfirm) => {
+    if (isConfirm) {
+      await axios.post("http://localhost:3001/delete-customer", {
+        idCustomer: customerToDelete.idCustomer,
+      })
+        .then((response) => {
+          if (response.status) {
+            Notification("success", "Xóa khách hàng thành công");
+            setRender(!render);
+          }
+          console.log(response);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      
+    }
+  }
   return (
     <Container className="ctn-customer-management" fluid={true}>
       <NotificationContainer />
@@ -186,10 +273,20 @@ const CustomerManagement = () => {
                     <td>{customer.Address}</td>
                     <td>{customer.CP}</td>
                     <td>
-                      <Button color="warning">
+                      <Button
+                        color="warning"
+                        onClick={() => {
+                          toggleUpdate();
+                          setCustomerToUpdate(customer);
+                        }}
+                      >
                         <AiTwotoneEdit />
                       </Button>{" "}
-                      <Button color="danger">
+                      <Button color="danger"
+                      onClick={() => {
+                        toggleDelete();
+                        setCustomerToDelete(customer);
+                      }}>
                         <IoMdRemoveCircleOutline />
                       </Button>
                     </td>
@@ -208,7 +305,120 @@ const CustomerManagement = () => {
           </Button>
         </Col>
       </Row>
-      <Modal isOpen={modalAdd} toggle={toggleAdd}>
+      <Modal isOpen={modalUpdate} toggle={toggleUpdate}>
+        <ModalHeader toggle={toggleUpdate}>Chỉnh sửa khách hàng</ModalHeader>
+        <ModalBody>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Tên khách hàng: </Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={customerToUpdate.FullName}
+                id="FullName"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Số điện thoại: </Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={customerToUpdate.Phone}
+                id="Phone"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Email</Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={customerToUpdate.Email}
+                id="Email"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Ngày sinh: </Label>
+            <Col sm={8}>
+              <Input
+                type="date"
+                defaultValue={customerToUpdate.DateOfBirth.slice(0, 10)}
+                id="DateOfBirth"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Địa chỉ: </Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={customerToUpdate.Address}
+                id="Address"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+          <InputGroup row className="margin-bottom-15">
+            <Label sm={4}>Điểm tích lũy: </Label>
+            <Col sm={8}>
+              <Input
+                defaultValue={customerToUpdate.CP}
+                id="CP"
+                onChange={(e) => {
+                  controlCustomerUpdate(e.target);
+                }}
+              />
+            </Col>
+          </InputGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            disabled={!allowSaveUpdate}
+            onClick={() => {
+              handleUpdate();
+              toggleUpdate();
+            }}
+          >
+            Lưu lại
+          </Button>
+          <Button color="secondary" onClick={toggleUpdate}>
+            Hủy bỏ
+          </Button>{" "}
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={modalDelete} toggle={toggleDelete}>
+        <ModalHeader toggle={toggleDelete}>Xóa sản phẩm</ModalHeader>
+        <ModalBody>Bạn có chắc muốn xóa sản phẩm</ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => {
+              let isConfirm = true;
+              handleDelete(isConfirm);
+              toggleDelete();
+            }}
+          >
+            Xác nhận
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleDelete}>
+            Hủy bỏ
+          </Button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={modalAdd} toggle={toggleAdd} backdrop="satic">
         <ModalHeader toggle={toggleAdd}>Thêm khách hàng</ModalHeader>
         <ModalBody>
           <InputGroup row className="margin-bottom-15">

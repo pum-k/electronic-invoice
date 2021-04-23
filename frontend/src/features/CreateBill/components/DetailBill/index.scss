@@ -8,12 +8,16 @@
     outline: none;
   }
 
+  &:disabled {
+    color: blue;
+  }
+
   &[type="number"]::-webkit-inner-spin-button,
   &[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+    color: blue;
   }
-  
 }
 
 .table th {
@@ -21,15 +25,15 @@
 }
 
 .table thead {
-    background-color: #0275d8;
-    color: white !important;
+  background-color: #0275d8;
+  color: white !important;
 }
 
 .result {
-    margin-top: 20px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: 55px;
+  margin-top: 20px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 55px;
 }
 
 .content-bottom__result {
@@ -48,8 +52,5 @@
 
   &:focus {
     outline: none !important;
-    
   }
 }
-
-

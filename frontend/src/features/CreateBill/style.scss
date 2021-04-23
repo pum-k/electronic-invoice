@@ -4,7 +4,11 @@
   background: white;
   position: relative;
 
-
+  &-mid__textarea{
+    color: #FF6B35;
+    border: none;
+    border-bottom: 1px dashed #ccc;
+  }
   &-mid Input {
     color: #FF6B35;
     border: none;
@@ -22,9 +26,7 @@
   margin-top: 20px;
 }
 
-.alert {
-  // position: absolute;
-}
+
 
 .modal-print-invoice {
   max-width: 1600px; 

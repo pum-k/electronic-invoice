@@ -222,7 +222,6 @@ const CustomerManagement = () => {
         .catch((err) => {
           console.log(err);
         });
-      
     }
   }
   return (

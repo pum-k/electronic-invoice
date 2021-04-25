@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./style.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -23,7 +23,6 @@ import "react-notifications/lib/notifications.css";
 
 const CreateBill = () => {
   const invoiceId = Date.now().toString().slice(7);
-
   const [customer, setCustomer] = useState();
   const [store, setStore] = useState([]);
   const [invoice, setInvoice] = useState();
@@ -53,15 +52,27 @@ const CreateBill = () => {
     return true;
   };
   const submitForm = () => {
-    if (
-      checkValidity(customer) &&
-      checkValidity(store) &&
-      checkValidity(invoice) &&
-      checkValidityArr(detailBill)
-    ) {
+    let flag = true;
+
+    if (!checkValidity(customer)) {
+      Notification("error", "Kiểm tra lại thông tin khách hàng");
+      flag = false;
+    }
+    if (!checkValidity(store)) {
+      Notification("error", "Kiểm tra lại thông tin cửa hàng");
+      flag = false;
+    }
+    if (!checkValidity(invoice)) {
+      Notification("error", "Kiểm tra lại thông tin hóa đơn");
+      flag = false;
+    }
+    if (!checkValidityArr(detailBill)) {
+      Notification("error", "Kiểm tra lại Chi tiết hóa đơn");
+      flag = false;
+    }
+
+    if (flag) {
       toggle();
-    } else {
-      console.log("Failed");
     }
   };
 
@@ -82,17 +93,30 @@ const CreateBill = () => {
       });
     detailBill.map((product, index) => {
       if (product.idProduct !== "") {
-        axios
-          .post("http://localhost:3001/order", {
-            idInvoice: invoiceId,
-            idProduct: product.idProduct,
-            Quantity: product.Quanlity,
-          })
-          .then((response) => {
-            console.log(response);
-          });
+        axios.post("http://localhost:3001/order", {
+          idInvoice: invoiceId,
+          idProduct: product.idProduct,
+          Quantity: product.Quanlity,
+        });
       }
     });
+    if (parseInt(totalShouldBePaied / 10000000) >= 1 && parseInt(customer.CP + totalShouldBePaied / 10000000) <= 10) {
+      axios
+        .post("http://localhost:3001/update-CP", {
+          idCustomer: customer.idCustomer,
+          CP: parseInt(totalShouldBePaied / 10000000),
+        })
+        .then((response) => {
+          if (response.status) {
+            console.log(response);
+          }
+        });
+    }
+    toggle();
+    Notification("success", "In hóa đơn thành công");
+    setInterval(() => {
+      window.location.reload();
+    }, 1000);
   };
   return (
     <>

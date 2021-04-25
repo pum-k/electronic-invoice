@@ -8,7 +8,23 @@ const Invoice = (params) => {
     invoiceDate: "",
     paymentOfMethod: "",
   });
-
+  const today = new Date();
+  const dateToday =
+        today.getFullYear() +
+        "-" +
+        ("0" + (today.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + today.getDate()).slice(-2);
+  useEffect(() => {
+    function createDefaultDate() {
+      const invoiceDate = {
+        ...invoice,
+        invoiceDate: dateToday,
+      };
+      setInvoice(invoiceDate);
+    }
+    createDefaultDate();
+  }, []);
   const handleOnChange = (input) => {
     switch (input.id) {
       case "typeMoney": {
@@ -71,6 +87,7 @@ const Invoice = (params) => {
             name="invoiceDate"
             id="invoiceDate"
             onChange={(e) => handleOnChange(e.target)}
+            defaultValue={dateToday}
           />
         </Col>
       </FormGroup>

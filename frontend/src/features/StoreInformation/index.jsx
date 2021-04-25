@@ -18,13 +18,14 @@ const StoreInformation = () => {
       try {
         const axiosData = await Axios.get("http://localhost:3001/store");
         const { data } = axiosData;
+        console.log(axiosData);
         setStore(data[0]);
       } catch (error) {
         console.log("Error fetching: " + error.message);
       }
     }
     getStore();
-  });
+  }, []);
 
   const [disable, setDisable] = useState(true);
   const toggleDisable = () => setDisable(!disable);

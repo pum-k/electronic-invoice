@@ -18,7 +18,7 @@ const PrintInvoices = (params) => {
   });
   const discount = (sumPayment * customer.CP) / 100;
   const totalShouldBePaied = () => {
-    return sumPayment + discount;
+    return parseInt(sumPayment) + parseInt(discount);
   };
   params.setTotalShouldBePaied(totalShouldBePaied);
 
@@ -79,7 +79,7 @@ const PrintInvoices = (params) => {
                 <tr>
                   <th>STT</th>
                   <th>Mã sản phẩm</th>
-                  <th>Số lương</th>
+                  <th>Số lượng</th>
                   <th>Đơn giá</th>
                   <th>Tổng tiền</th>
                 </tr>

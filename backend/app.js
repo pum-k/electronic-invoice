@@ -239,3 +239,18 @@ app.post("/getInvoice", (req, res) => {
     else res.send(results);
   })
 })
+
+app.post("/delete-invoice", (req, res) => {
+  connection.query("call pr_deleteInvoice(?)", [req.body.idInvoice], (err, results) => {
+    if (err) res.send(err)
+    else res.send({status: true});
+  })
+})
+
+app.post("/update-CP", (req, res) => {
+  console.log(req.body.IdCustomer ,req.body.CP);
+  connection.query("call pr_updateCP(?,?)", [req.body.idCustomer ,req.body.CP], (err, results) => {
+    if (err) res.send(err)
+    else res.send({status: true});
+  })
+})
